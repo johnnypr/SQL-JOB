@@ -10,10 +10,14 @@ class ExcelSheet:
     arrSheet=[]
     s1 = []
     s2 = [] 
-    f1 = ""
-    f2 = ""
+    f1 = None
+    f2 = None
     key1 = []
     key2 = []
+    usrKey1 = []
+    usrKey2 = []
+    sheet1 = None
+    sheet2 = None
 
     def __init__(self):
         fileName = None
@@ -28,42 +32,98 @@ class ExcelSheet:
         excel_two = xlrd.open_workbook(file2)
 
         #In case there are more than one sheet in the Excel file we can change it manually by switching the index
-        sheet1 = excel_one.sheet_by_index(0)
-        sheet2 = excel_two.sheet_by_index(0) 
+        self.sheet1 = excel_one.sheet_by_index(0)
+        self.sheet2 = excel_two.sheet_by_index(0) 
  
         #Load the Excel column keys so the user may pick which columns they may want to load                
-        for i in range(1,sheet1.ncols):
-            self.key1.append(str((sheet1.cell(0,i).value).upper()))
+        for i in range(1,self.sheet1.ncols):
+            self.key1.append(str((self.sheet1.cell(0,i).value).upper()))
 
-        for j in range(1,sheet2.ncols):
-            self.key2.append(str((sheet2.cell(0,j).value).upper()))
+        for j in range(1,self.sheet2.ncols):
+            self.key2.append(str((self.sheet2.cell(0,j).value).upper()))
 
         
-    def loadData(self):
+    def chooseData(self):
         #Stores users decisions in arrays
         choice_one =[]
         choice_two =[]
 
+        #CHANGE FROM INDEX TO NAME
         #Ask user to choose which data to load
-        text = colored(self.f1,'green')
-        print("From file, ", text," choose which colums to load:  ")
+        print("From file, ",colored(self.f1,'green')," choose which colums to load:  ")
         print(self.key1)
         usrInput = input("1. Choose the keys you which to load from the above list, to move to the next list enter \"x\":  ")
         while usrInput != "x":
             if usrInput != 'x':
                 choice_one.append(usrInput)
             usrInput = input('Add another or enter \"x\" to quit: ')
-        print(choice_one)
+        #print(choice_one)
         
-        print("From file ",colored(self.f2,'red')," choose which columns to load")
+        print("From file ",colored(self.f2,'green')," choose which columns to load")
         print(self.key2)
         usrInput = input("1. Choose the keys you which to load from the above list, to move to the next list enter \"x\":  ")
         while usrInput != "x":
             if usrInput != 'x':
                 choice_two.append(usrInput)
             usrInput = input("Add another or enter \"x\" to quit: ")
-        print(choice_two)
+        #print(choice_two)
 
+        print('----------------------------------------------------------')
+
+
+        usrInput= input("Do you wish to restart the choice? [y]/[n]: ")
+
+        print('----------------------------------------------------------')
+        
+        if usrInput == 'y':
+            choice_one = []
+            choice_two = []
+            self.chooseData()
+        elif usrInput == 'n':
+            self.parseData(choice_one,choice_two)
+
+    def parseData(self,choice_one,choice_two):
+        for i in range(len(choice_one)):
+            self.usrKey1.append(self.key1[int(choice_one[i])])
+
+        for i in range(len(choice_two)):
+            self.usrKey2.append(self.key2[int(choice_two[i])])
+    
+        
+        if len(self.usrKey1)>1:
+            print(self.usrKey1)
+            usrInput = input("From file " + str(colored(self.f1,'green')) + " which will be used to compare? ")
+            x = self.usrKey1[int(usrInput)]
+        else:
+            x = self.usrKey1[0]
+        
+            
+        if len(self.usrKey2)>1:
+            print(self.usrKey2)
+            usrInput = input("From file "+ str(colored(self.f2,'green')) +" which will be used to compare? ")
+            y = self.usrKey2[int(usrInput)]
+        else:
+            y = self.usrKey2[0]
+        
+        print('----------------------------------------------------------')
+
+
+        print(colored("These will be the ID's we will be comparing",'green'))
+        print(x)
+        print(y)
+        print('----------------------------------------------------------')
+
+
+        for i in range(self.sheet1.nrows):
+            pass
+
+        for j in range(1,self.sheet1.nrows):
+            pass
+   
+   
+   
+   
+   
     def setFileName(self,fileName):
         if ".xlsx" not in fileName:
             self.fileName = str(fileName)+".xlsx"

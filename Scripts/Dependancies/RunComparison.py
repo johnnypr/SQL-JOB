@@ -6,7 +6,7 @@ ag2 = sys.argv[2]
 
 excel = ExcelSheet()
 excel.dataSets(ag1,ag2)
-excel.loadData()
+excel.chooseData()
 
 
 
