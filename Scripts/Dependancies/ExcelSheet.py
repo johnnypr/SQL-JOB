@@ -1,5 +1,6 @@
 import xlrd
 import numpy as np
+from termcolor import colored
 from openpyxl import Workbook, load_workbook
 from tqdm import tqdm
 import time
@@ -8,38 +9,61 @@ class ExcelSheet:
     book = Workbook()
     arrSheet=[]
     s1 = []
-    s2 = []
-    
-    
+    s2 = [] 
+    f1 = ""
+    f2 = ""
+    key1 = []
+    key2 = []
+
     def __init__(self):
-
         fileName = None
-        currentRow =0
-        currentColumn = 0
-    
-    def dataSets(file1,file2):
-        loc1 = (file1)
-        loc2 = (file2)
 
-        fileToLink = xlrd.open_workbook(loc1) 
-        confirmID = xlrd.open_workbook(loc2)
+    def dataSets(self,file1,file2):
+        #Sets File Name class variables
+        self.f1 = file1
+        self.f2 = file2
 
-        sheet1 = fileToLink.sheet_by_index(0)
-        sheet2 = confirmID.sheet_by_index(0) 
+        #Initiates the Connection from The Excel Sheet to the Python Scripts
+        excel_one = xlrd.open_workbook(file1) 
+        excel_two = xlrd.open_workbook(file2)
+
+        #In case there are more than one sheet in the Excel file we can change it manually by switching the index
+        sheet1 = excel_one.sheet_by_index(0)
+        sheet2 = excel_two.sheet_by_index(0) 
  
-        j=1
-        i=1
-        
-        for i in range(sheet2.nrows):
-            self.s2.append([str((sheet2.cell(i,1).value).lower()),str((sheet2.cell(i,0).value))])
-            
-        print(self.s2[1][1])
+        #Load the Excel column keys so the user may pick which columns they may want to load                
+        for i in range(1,sheet1.ncols):
+            self.key1.append(str((sheet1.cell(0,i).value).upper()))
 
-        for j in range(sheet1.nrows):
-            self.s1.append(str((sheet1.cell(j,1).value).lower()))
-        self.s1.sort
+        for j in range(1,sheet2.ncols):
+            self.key2.append(str((sheet2.cell(0,j).value).upper()))
+
         
+    def loadData(self):
+        #Stores users decisions in arrays
+        choice_one =[]
+        choice_two =[]
+
+        #Ask user to choose which data to load
+        text = colored(self.f1,'green')
+        print("From file, ", text," choose which colums to load:  ")
+        print(self.key1)
+        usrInput = input("1. Choose the keys you which to load from the above list, to move to the next list enter \"x\":  ")
+        while usrInput != "x":
+            if usrInput != 'x':
+                choice_one.append(usrInput)
+            usrInput = input('Add another or enter \"x\" to quit: ')
+        print(choice_one)
         
+        print("From file ",colored(self.f2,'red')," choose which columns to load")
+        print(self.key2)
+        usrInput = input("1. Choose the keys you which to load from the above list, to move to the next list enter \"x\":  ")
+        while usrInput != "x":
+            if usrInput != 'x':
+                choice_two.append(usrInput)
+            usrInput = input("Add another or enter \"x\" to quit: ")
+        print(choice_two)
+
     def setFileName(self,fileName):
         if ".xlsx" not in fileName:
             self.fileName = str(fileName)+".xlsx"
@@ -60,8 +84,7 @@ class ExcelSheet:
         index = 0
         data = self.s1
         
-        
-        
+  
         if r == None:
             r = len(data)-1
 
