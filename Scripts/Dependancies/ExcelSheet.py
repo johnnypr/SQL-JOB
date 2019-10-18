@@ -1,9 +1,10 @@
 import xlrd
+from os import system,name
 import numpy as np
 from termcolor import colored
 from openpyxl import Workbook, load_workbook
 from tqdm import tqdm
-import time
+from time import sleep
 
 class ExcelSheet: 
     book = Workbook()
@@ -18,9 +19,11 @@ class ExcelSheet:
     usrKey2 = []
     sheet1 = None
     sheet2 = None
-
     def __init__(self):
         fileName = None
+        self.setFileName()
+        self.createSheet()
+        
 
     def dataSets(self,file1,file2):
         #Sets File Name class variables
@@ -36,12 +39,11 @@ class ExcelSheet:
         self.sheet2 = excel_two.sheet_by_index(0) 
  
         #Load the Excel column keys so the user may pick which columns they may want to load                
-        for i in range(1,self.sheet1.ncols):
+        for i in range(self.sheet1.ncols):
             self.key1.append(str((self.sheet1.cell(0,i).value).upper()))
 
-        for j in range(1,self.sheet2.ncols):
+        for j in range(self.sheet2.ncols):
             self.key2.append(str((self.sheet2.cell(0,j).value).upper()))
-
         
     def chooseData(self):
         #Stores users decisions in arrays
@@ -70,7 +72,11 @@ class ExcelSheet:
 
         print('----------------------------------------------------------')
 
+        print("From ", colored(self.f1,'green'), " ,we loaded","\n", choice_one)
+        print("From ", colored(self.f2,'green'), " ,we loaded","\n", choice_two)
+        print('----------------------------------------------------------')
 
+    
         usrInput= input("Do you wish to restart the choice? [y]/[n]: ")
 
         print('----------------------------------------------------------')
@@ -78,8 +84,10 @@ class ExcelSheet:
         if usrInput == 'y':
             choice_one = []
             choice_two = []
+            self.clear()
             self.chooseData()
         elif usrInput == 'n':
+            self.clear()
             self.parseData(choice_one,choice_two)
 
     def parseData(self,choice_one,choice_two):
@@ -109,36 +117,47 @@ class ExcelSheet:
 
 
         print(colored("These will be the ID's we will be comparing",'green'))
-        print(x)
-        print(y)
+        print("X: ",x)
+        print("Y: ",y)
         print('----------------------------------------------------------')
 
 
-        for i in range(self.sheet1.nrows):
-            pass
+       
+        for i in range(1,self.sheet1.nrows):
+            self.s1.append(str((self.sheet1.cell(i,self.findColumn(self.key1,x)).value)))
 
-        for j in range(1,self.sheet1.nrows):
-            pass
-   
-   
-   
-   
-   
-    def setFileName(self,fileName):
-        if ".xlsx" not in fileName:
-            self.fileName = str(fileName)+".xlsx"
+        for j in range(1,self.sheet2.nrows):
+            self.s2.append(str((self.sheet2.cell(j,self.findColumn(self.key2,y)).value)))
+
+        self.compare()
+
+    def findColumn(self,key,id):
+       for i in range(len(key)):
+           if key[i] == id:
+               return i
+       
+    def setFileName(self):
+        fileName = input("Enter a filename: ")
+        if ".txt" not in fileName:
+            self.fileName = str(fileName)+".txt"
             
         self.fileName = str(self.fileName)
-        print(self.fileName)
-    
-    def createSheet(self,name):
-        sheet = self.book.active
+        print("Filename: ", colored(self.fileName, 'green'))
+        stdIn = input("Is this correct? [y]/[n] ")
+
+        if stdIn != 'y':
+            self.fileName =None
+            self.clear()
+            self.setFileName()
         
+        self.clear()
+    
+    def createSheet(self):
+        sheet = self.book.active
         self.arrSheet.append(sheet)
 
     def save(self):
         self.book.save(self.fileName)
-
 
     def createBase(self,r=None,sheet_num=None):
         index = 0
@@ -162,24 +181,58 @@ class ExcelSheet:
     
         # Print iterations progress
          
+    def clear(self): 
+        # for windows 
+        if name == 'nt': 
+            _ = system('cls') 
+  
+        # for mac and linux(here, os.name is 'posix') 
+        else: 
+            _ = system('clear') 
 
-    def compare(self,s):
+    def compare(self,s=0):
         percent = 0
         sheet = self.arrSheet[0]
-        l = len(self.s2)-1
-        for i in tqdm(range(s,l)):
-            temp = self.s2[i][0]
-            for j in range(1,len(self.s1)):
-                temp2 = self.s1[j]
-                if temp[0] != temp2[0]:
+
+        x  = None
+        y = None
+        
+        file = open(self.fileName,"w+") 
+
+        for i in tqdm(range(s,len(self.s1))):
+            x = self.s1[i]
+            for j in range(len(self.s2)):
+                y = self.s2[j]
+                if x[0] != y[0]:
                     continue
                 else:
-                    ratio = self.levenshtein(temp,temp2)
+                    ratio = self.levenshtein(x,y)
                     if ratio <= 2:
-                        percent += 1
-                        cellref = sheet.cell(row=j,column=1)
-                        cellref.value= self.s2[i][1]
-        print(str((percent/l)*100))
+                        result = "X: " +str(x) +" Y: "+ str(y)
+                        file.write(result)
+                        percent+=1
+                
+
+
+
+
+
+
+        # l = len(self.s2)-1
+        # for i in tqdm(range(s,l)):
+        #     temp = self.s2[i]
+        #     for j in range(len(self.s1)):
+        #         temp2 = self.s1[j]
+        #         if temp[0] != temp2[0]:
+        #             continue
+        #         else:
+        #             ratio = self.levenshtein(temp,temp2)
+        #             if ratio <= 2:
+        #                 percent += 1
+                        
+        # self.save()
+        file.close()
+        print(str((percent/len(self.s2))*100))
              
     def levenshtein(self,str1,str2):
         size_x = len(str1) + 1
