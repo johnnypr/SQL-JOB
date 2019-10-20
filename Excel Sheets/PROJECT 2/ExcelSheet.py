@@ -200,37 +200,26 @@ class ExcelSheet:
         file = open(self.fileName,"w+") 
 
         for i in tqdm(range(s,len(self.s1))):
-            x = self.s1[i]
+            x = str(self.s1[i])
             for j in range(len(self.s2)):
-                y = self.s2[j]
+                y = str(self.s2[j])
                 if x[0] != y[0]:
                     continue
                 else:
-                    ratio = self.levenshtein(x,y)
-                    if ratio <= 2:
-                        result = "X: " +str(x) +" Y: "+ str(y)
-                        file.write(result)
-                        percent+=1
+                    try:
+                        c1 = x.split()
+                        c2 = y.split()
+                        c1 = c1[0] + " " + c1[1]
+                        c2 = c2[0] + " " + c2[1]
+                    except:
+                        c1 = x
+                        c2 = y
+                    finally:
+                        if c1 == c2:
+                            result = "X: " +str(x) +" Y: "+ str(y) + "\n"
+                            file.write(result)
+                            percent+=1
                 
-
-
-
-
-
-
-        # l = len(self.s2)-1
-        # for i in tqdm(range(s,l)):
-        #     temp = self.s2[i]
-        #     for j in range(len(self.s1)):
-        #         temp2 = self.s1[j]
-        #         if temp[0] != temp2[0]:
-        #             continue
-        #         else:
-        #             ratio = self.levenshtein(temp,temp2)
-        #             if ratio <= 2:
-        #                 percent += 1
-                        
-        # self.save()
         file.close()
         print(str((percent/len(self.s2))*100))
              
