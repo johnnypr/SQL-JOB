@@ -207,9 +207,9 @@ class ExcelSheet:
                     continue
                 else:
                     ratio = self.levenshtein(x,y)
-                    if ratio <= 2:
+                    if ratio <= 1:
                         result = "X: " +str(x) +" Y: "+ str(y)
-                        file.write(result)
+                        file.write(result + "\n")
                         percent+=1
                 
 
