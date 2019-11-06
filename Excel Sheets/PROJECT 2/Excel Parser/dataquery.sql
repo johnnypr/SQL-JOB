@@ -1,0 +1,15 @@
+-- SQLite
+
+
+
+SELECT COMPANIES.Company_Name,COMPANIES.ticker,COMPANIES.gvkey,COMPANIES.naics,DATA.company_ID
+FROM DATA
+INNER JOIN COMPANIES ON COMPANIES.Company_Name = DATA.company_name
+ORDER BY COMPANIES.Company_Name;
+
+
+
+-- SELECT COMPANIES.Company_Name,COMPANIES.ticker,COMPANIES.gvkey,COMPANIES.naics,DATA.company_ID
+-- INTO CONFIRMED_ID
+-- FROM DATA, COMPANIES
+-- WHERE COMPANIES.Company_Name = DATA.company_name);
