@@ -8,14 +8,10 @@ class parse_ranker():
     year_queue = None
     conn = None
     
-    
     def __init__(self,db):
         self.db = db
         self.conn = sqlite3.connect(db)
-
-    
         self.buyers_queue = [buyer[0].encode('utf-8') for buyer in self.fextract('buyers',2)]
-
         self.mainloop()    
     
     def fextract(self,info,limit=None):
@@ -33,10 +29,13 @@ class parse_ranker():
             self.current_buyer = buyers.decode('utf-8')
             self.year_queue = self.fextract('years'))
 
+#     We will get the assets in the three related tables in and ordered set
     def getAssets(self):
         pass
+#     We will get the shares in the three related tables in and ordered set
     def getShare(self):
         pass
+#     We will get the sales in the three related tables in and ordered set
     def getSales(self):
         pass
     def populate(self):
