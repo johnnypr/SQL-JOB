@@ -14,6 +14,7 @@ class parse_ranker():
         self.buyers_queue = [buyer[0].encode('utf-8') for buyer in self.fextract('buyers',2)]
         self.mainloop()    
     
+    #where sample == 1 
     def fextract(self,info,limit=None):
         if info == "buyers":
             if limit:
